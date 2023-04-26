@@ -69,11 +69,11 @@ class FilmControllerTest {
     @Test
     void checkWrongReleaseDateValidation() throws ValidationException, NullPointerException {
         film.setReleaseDate(null);
-         ValidationException thrown = assertThrows(ValidationException.class, () -> {
+        ValidationException thrown = assertThrows(ValidationException.class, () -> {
             Set<ConstraintViolation<Film>> validateWrongDate = validator.validate(film);
         }, "ValidationException was expected.");
 
-        film.setReleaseDate(LocalDate.of(1861,2,19));
+        film.setReleaseDate(LocalDate.of(1861, 2, 19));
         Set<ConstraintViolation<Film>> validateWrongDate = validator.validate(film);
         violations = makeViolationList(validateWrongDate);
         assertEquals("Field \"releaseDate\" cannot be earlier than 1895-12-28.", violations.get(0));
@@ -91,6 +91,7 @@ class FilmControllerTest {
         violations = makeViolationList(validateWrongDuration);
         assertEquals("Value of field \"duration\"must be greater than zero.", violations.get(0));
     }
+
     @Test
     void checkSendingEmptyRequestForCreationUser() throws NullPointerException {
         Film emptyFilm = null;
@@ -111,8 +112,7 @@ class FilmControllerTest {
         assertEquals("film is marked non-null but is null", thrown.getMessage());
 
         film.setId(null);
-        ru.yandex.practicum.filmorate.exception.ValidationException exception = assertThrows(ru.yandex.practicum.filmorate.exception.ValidationException.class,
-                () -> {
+        ru.yandex.practicum.filmorate.exception.ValidationException exception = assertThrows(ru.yandex.practicum.filmorate.exception.ValidationException.class, () -> {
             controller.updateFilm(film);
         }, "ValidationException was expected.");
         assertEquals("There is no such movie in database or field \"id\" is empty.", exception.getMessage());
