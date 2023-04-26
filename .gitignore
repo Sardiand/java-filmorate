@@ -7,12 +7,16 @@
 *.zip
 *.tar.gz
 *.rar
+*.yml
+*.xml
 hs_err_pid*
 out/
 target/
+.github/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+
 
 ### STS ###
 .apt_generated
