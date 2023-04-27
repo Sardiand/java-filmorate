@@ -117,7 +117,7 @@ class FilmControllerTest {
         }, "ValidationException was expected.");
         assertEquals("There is no such movie in database or field \"id\" is empty.", exception.getMessage());
 
-        film.setId(138);
+        film.setId(138L);
         exception = assertThrows(ru.yandex.practicum.filmorate.exception.ValidationException.class, () -> {
             controller.updateFilm(film);
         }, "ValidationException was expected.");

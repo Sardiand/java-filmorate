@@ -93,9 +93,7 @@ class UserControllerTest {
     void checkUpdatingWithEmptyRequestOrWithWrongId() throws NullPointerException, ValidationException {
         User emptyUser = null;
         UserController controller = new UserController();
-        NullPointerException thrown = assertThrows(NullPointerException.class, () -> {
-            controller.updateUser(emptyUser);
-        }, "NullPointerException was expected.");
+        NullPointerException thrown = assertThrows(NullPointerException.class, () -> controller.updateUser(emptyUser), "NullPointerException was expected.");
         assertEquals("user is marked non-null but is null", thrown.getMessage());
 
         ValidationException exception = assertThrows(ValidationException.class, () -> {
@@ -103,7 +101,7 @@ class UserControllerTest {
         }, "ValidationException was expected.");
         assertEquals("There is no such user in database or field \"id\" is empty.", exception.getMessage());
 
-        user.setId(138);
+        user.setId(138L);
         exception = assertThrows(ValidationException.class, () -> {
             controller.updateUser(user);
         }, "ValidationException was expected.");
