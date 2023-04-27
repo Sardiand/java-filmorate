@@ -16,11 +16,11 @@ import java.util.Map;
 @RestController
 @Slf4j
 public class UserController {
-    private final Map<Integer, User> userMap = new HashMap<>();
-    private int id = 0;
+    private final Map<Long, User> userMap = new HashMap<>();
+    private long id = 0L;
 
     @PostMapping("/users")
-    public User createUser(@NonNull @Valid @RequestBody User user) throws ValidationException {
+    public User createUser(@NonNull @Valid @RequestBody User user) {
         id++;
         user.setId(id);
         if (user.getName() == null || user.getName().isBlank() || user.getName().isEmpty()) {
@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @PutMapping("/users")
-    public User updateUser(@NonNull @RequestBody User user) throws ValidationException {
+    public User updateUser(@NonNull @RequestBody User user) {
         if (!userMap.containsKey(user.getId()) || user.getId() == null) {
             ValidationException exception = new ValidationException("There is no such user in database or field \"id\" is empty.");
             log.error("ValidationException: " + exception.getMessage());

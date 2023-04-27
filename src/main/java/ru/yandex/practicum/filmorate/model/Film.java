@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Data
 public class Film {
-    private Integer id;
+    private Long id;
     @NotBlank(message = "Field \"name\" cannot be empty.")
     private String name;
     @Size(max = 200, message = "Field \"description\" cannot contain more than 200 symbols.")
