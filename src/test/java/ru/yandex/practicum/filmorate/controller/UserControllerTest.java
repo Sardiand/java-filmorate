@@ -103,7 +103,7 @@ class UserControllerTest {
         }, "ValidationException was expected.");
         assertEquals("There is no such user in database or field \"id\" is empty.", exception.getMessage());
 
-        user.setId(138);
+        user.setId(138L);
         exception = assertThrows(ValidationException.class, () -> {
             controller.updateUser(user);
         }, "ValidationException was expected.");
