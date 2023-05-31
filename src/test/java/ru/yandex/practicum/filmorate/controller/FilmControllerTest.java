@@ -118,13 +118,13 @@ class FilmControllerTest {
         UpdateValidationException exception = assertThrows(UpdateValidationException.class, () -> {
             controller.updateFilm(film);
         }, "ValidationException was expected.");
-        assertEquals("There is no such movie in database or field \"id\" is empty.", exception.getMessage());
+        assertEquals("There is no such film in database or field \"id\" is empty.", exception.getMessage());
 
         film.setId(138L);
         exception = assertThrows(UpdateValidationException.class, () -> {
             controller.updateFilm(film);
         }, "ValidationException was expected.");
-        assertEquals("There is no such movie in database or field \"id\" is empty.", exception.getMessage());
+        assertEquals("There is no such film in database or field \"id\" is empty.", exception.getMessage());
     }
 
     private List<String> makeViolationList(Set<ConstraintViolation<Film>> validate) {

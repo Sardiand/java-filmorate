@@ -50,17 +50,17 @@ class UserControllerTest {
         user.setEmail(null);
         Set<ConstraintViolation<User>> validateNotNull = validator.validate(user);
         violations = makeViolationList(validateNotNull);
-        assertEquals("Field \"Email\" cannot be empty.", violations.get(0));
+        assertEquals("Invalid email format.", violations.get(0));
 
         user.setEmail("");
         Set<ConstraintViolation<User>> validateNotEmpty = validator.validate(user);
         violations = makeViolationList(validateNotEmpty);
-        assertEquals("Field \"Email\" cannot be empty.", violations.get(0));
+        assertEquals("Invalid email format.", violations.get(0));
 
         user.setEmail("         ");
         Set<ConstraintViolation<User>> validateNotBlank = validator.validate(user);
         violations = makeViolationList(validateNotBlank);
-        assertEquals("Field \"Email\" cannot be empty.", violations.get(0));
+        assertEquals("Invalid email format.", violations.get(0));
     }
 
     @Test

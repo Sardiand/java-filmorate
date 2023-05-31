@@ -14,6 +14,8 @@ public class User {
     private Long id;
 
     @EqualsAndHashCode.Exclude
+    @NotBlank(message = "Invalid email format.")
+    @NotNull(message = "Invalid email format.")
     @Email(message = "Invalid email format.")
     private String email;
 
