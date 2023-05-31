@@ -56,7 +56,7 @@ public class FilmService {
         return new ArrayList<>(filmStorage.getFilms().values());
     }
 
-    public void addLike (long filmId, long userId) {
+    public void addLike(long filmId, long userId) {
         if (!filmStorage.getFilms().containsKey(filmId)) {
             throw new FilmNotExistsException("There is no such film in the database.");
         }
@@ -68,7 +68,7 @@ public class FilmService {
         filmStorage.updateFilm(film);
     }
 
-    public void deleteLike (long filmId, long userId) {
+    public void deleteLike(long filmId, long userId) {
         if (!filmStorage.getFilms().containsKey(filmId)) {
             throw new FilmNotExistsException("There is no such film in the database.");
         }
@@ -80,14 +80,14 @@ public class FilmService {
         filmStorage.updateFilm(film);
     }
 
-    public List<Film> getPopularFilms(int count){
+    public List<Film> getPopularFilms(int count) {
         if (count <= 0) {
             throw new IncorrectParameterException("count");
         }
         List<Film> filmList = new ArrayList<>(filmStorage.getFilms().values());
         filmList.sort(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()));
         if (filmList.size() > count) {
-           return filmList.subList(0, count);
+            return filmList.subList(0, count);
         } else {
             return filmList;
         }

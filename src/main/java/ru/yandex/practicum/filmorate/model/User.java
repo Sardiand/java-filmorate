@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import javax.validation.constraints.*;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

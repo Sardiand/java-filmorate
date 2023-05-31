@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.exception;
 
 import lombok.NoArgsConstructor;
 
-
 @NoArgsConstructor
 public class UpdateValidationException extends RuntimeException {
 

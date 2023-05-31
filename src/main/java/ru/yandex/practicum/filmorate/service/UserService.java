@@ -35,7 +35,7 @@ public class UserService {
 
     public User deleteUser(long id) {
         if (!userStorage.getUsers().containsKey(id)) {
-           throw new UserNotExistException("There is no such user in the database.");
+            throw new UserNotExistException("There is no such user in the database.");
         }
         User user = userStorage.getUser(id);
         userStorage.deleteUser(id);
@@ -69,7 +69,7 @@ public class UserService {
         userStorage.updateUser(friend);
     }
 
-    public void deleteFriend (long userId, long friendId) {
+    public void deleteFriend(long userId, long friendId) {
         if (!userStorage.getUsers().containsKey(userId) || !userStorage.getUsers().containsKey(friendId)) {
             throw new UserNotExistException("There are no one or both users in the database.");
         } else if (!userStorage.getUser(userId).getFriends().contains(friendId)) {
@@ -85,15 +85,11 @@ public class UserService {
         userStorage.updateUser(friend);
     }
 
-    public List<User> getFriends (long userId) {
-        return getUser(userId).getFriends().stream().map(this::getUser)
-                .collect(Collectors.toList());
+    public List<User> getFriends(long userId) {
+        return getUser(userId).getFriends().stream().map(this::getUser).collect(Collectors.toList());
     }
 
     public List<User> getCommonFriends(long userId, long otherId) {
-         return getUser(userId).getFriends().stream()
-                .filter((i) -> getUser(otherId).getFriends().contains(i))
-                .map(this::getUser)
-                .collect(Collectors.toList());
+        return getUser(userId).getFriends().stream().filter((i) -> getUser(otherId).getFriends().contains(i)).map(this::getUser).collect(Collectors.toList());
     }
 }

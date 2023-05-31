@@ -15,9 +15,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleIncorrectParameterException(final IncorrectParameterException e) {
-        return new ErrorResponse(
-                String.format("Error in field \"%s\".", e.getParameter())
-        );
+        return new ErrorResponse(String.format("Error in field \"%s\".", e.getParameter()));
     }
 
     @ExceptionHandler
