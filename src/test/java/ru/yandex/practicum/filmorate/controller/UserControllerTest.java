@@ -3,8 +3,10 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.UpdateValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -19,11 +21,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserControllerTest {
     private static Validator validator;
+    private UserController controller;
+
     private User user;
     private List<String> violations;
 
     @BeforeAll
-    static void setValidator() {
+    static void setValidatorAndControllers() {
         validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
@@ -33,6 +37,7 @@ class UserControllerTest {
         user.setLogin("login");
         user.setEmail("user@yahoo.com");
         user.setBirthday(LocalDate.of(1952, 10, 7));
+        controller = new UserController(new UserService(new InMemoryUserStorage()));
     }
 
     @Test
@@ -80,9 +85,9 @@ class UserControllerTest {
     }
 
     @Test
-    void checkSendingEmptyRequestForCreationUser() throws NullPointerException {
+    void checkSendingEmptyRequestForCreationUser() {
         User emptyUser = null;
-        UserController controller = new UserController();
+
         NullPointerException thrown = assertThrows(NullPointerException.class, () -> {
             controller.createUser(emptyUser);
         }, "NullPointerException was expected.");
@@ -90,21 +95,20 @@ class UserControllerTest {
     }
 
     @Test
-    void checkUpdatingWithEmptyRequestOrWithWrongId() throws NullPointerException, ValidationException {
+    void checkUpdatingWithEmptyRequestOrWithWrongId() {
         User emptyUser = null;
-        UserController controller = new UserController();
         NullPointerException thrown = assertThrows(NullPointerException.class, () -> controller.updateUser(emptyUser), "NullPointerException was expected.");
         assertEquals("user is marked non-null but is null", thrown.getMessage());
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> {
+        UpdateValidationException exception = assertThrows(UpdateValidationException.class, () -> {
             controller.updateUser(user);
-        }, "ValidationException was expected.");
+        }, "UpdateValidationException was expected.");
         assertEquals("There is no such user in database or field \"id\" is empty.", exception.getMessage());
 
         user.setId(138L);
-        exception = assertThrows(ValidationException.class, () -> {
+        exception = assertThrows(UpdateValidationException.class, () -> {
             controller.updateUser(user);
-        }, "ValidationException was expected.");
+        }, "UpdateValidationException was expected.");
         assertEquals("There is no such user in database or field \"id\" is empty.", exception.getMessage());
     }
 

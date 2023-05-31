@@ -4,9 +4,9 @@ import lombok.NoArgsConstructor;
 
 
 @NoArgsConstructor
-public class ValidationException extends RuntimeException {
+public class UpdateValidationException extends RuntimeException {
 
-    public ValidationException(String message) {
+    public UpdateValidationException(String message) {
         super(message);
     }
 }
