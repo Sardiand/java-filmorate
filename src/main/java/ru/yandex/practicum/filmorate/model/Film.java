@@ -20,7 +20,7 @@ public class Film {
     private String name;
 
     @EqualsAndHashCode.Exclude
-    @Size(max = 200, message = "Field \"description\" cannot contain more than 500 symbols.")
+    @Size(max = 200, message = "Field \"description\" cannot contain more than 200 symbols.")
     private String description;
 
     @EqualsAndHashCode.Exclude
