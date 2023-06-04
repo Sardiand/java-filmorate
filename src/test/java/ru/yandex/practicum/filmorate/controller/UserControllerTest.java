@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exception.UpdateValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
@@ -100,15 +100,15 @@ class UserControllerTest {
         NullPointerException thrown = assertThrows(NullPointerException.class, () -> controller.updateUser(emptyUser), "NullPointerException was expected.");
         assertEquals("user is marked non-null but is null", thrown.getMessage());
 
-        UpdateValidationException exception = assertThrows(UpdateValidationException.class, () -> {
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
             controller.updateUser(user);
-        }, "UpdateValidationException was expected.");
+        }, "NotFoundException was expected.");
         assertEquals("There is no such user in database or field \"id\" is empty.", exception.getMessage());
 
         user.setId(138L);
-        exception = assertThrows(UpdateValidationException.class, () -> {
+        exception = assertThrows(NotFoundException.class, () -> {
             controller.updateUser(user);
-        }, "UpdateValidationException was expected.");
+        }, "NotFoundException was expected.");
         assertEquals("There is no such user in database or field \"id\" is empty.", exception.getMessage());
     }
 

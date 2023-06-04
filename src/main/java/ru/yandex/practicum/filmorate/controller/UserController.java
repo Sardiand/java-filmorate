@@ -23,12 +23,12 @@ public class UserController {
 
     @PostMapping("/users")
     public User createUser(@NonNull @Valid @RequestBody User user) {
-        return userService.createUser(user);
+        return userService.create(user);
     }
 
     @PutMapping("/users")
     public User updateUser(@NonNull @RequestBody User user) {
-        return userService.updateUser(user);
+        return userService.update(user);
     }
 
     @GetMapping("/users")
@@ -38,12 +38,17 @@ public class UserController {
 
     @GetMapping("/users/{id}")
     public User getUser(@PathVariable Long id) {
-        return userService.getUser(id);
+        return userService.getById(id);
     }
 
     @PutMapping("/users/{id}/friends/{friendId}")
     public void addFriend(@PathVariable("id") long userId, @PathVariable long friendId) {
         userService.addFriend(userId, friendId);
+    }
+
+    @DeleteMapping("/users/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        userService.delete(id);
     }
 
     @DeleteMapping("/users/{id}/friends/{friendId}")

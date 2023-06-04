@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exception.UpdateValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
@@ -62,7 +62,7 @@ class FilmControllerTest {
 
     @Test
     void checkWrongDescriptionValidation() {
-        byte[] array = new byte[300];
+        byte[] array = new byte[999];
         new Random().nextBytes(array);
         String generatedString = new String(array, StandardCharsets.UTF_8);
         film.setDescription(generatedString);
@@ -107,7 +107,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void checkUpdatingWithEmptyRequestOrWithWrongId() throws UpdateValidationException {
+    void checkUpdatingWithEmptyRequestOrWithWrongId() {
         Film emptyFilm = null;
         NullPointerException thrown = assertThrows(NullPointerException.class, () -> {
             controller.updateFilm(emptyFilm);
@@ -115,15 +115,15 @@ class FilmControllerTest {
         assertEquals("film is marked non-null but is null", thrown.getMessage());
 
         film.setId(null);
-        UpdateValidationException exception = assertThrows(UpdateValidationException.class, () -> {
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
             controller.updateFilm(film);
-        }, "ValidationException was expected.");
+        }, "NotFoundException was expected.");
         assertEquals("There is no such film in database or field \"id\" is empty.", exception.getMessage());
 
         film.setId(138L);
-        exception = assertThrows(UpdateValidationException.class, () -> {
+        exception = assertThrows(NotFoundException.class, () -> {
             controller.updateFilm(film);
-        }, "ValidationException was expected.");
+        }, "NotFoundException was expected.");
         assertEquals("There is no such film in database or field \"id\" is empty.", exception.getMessage());
     }
 

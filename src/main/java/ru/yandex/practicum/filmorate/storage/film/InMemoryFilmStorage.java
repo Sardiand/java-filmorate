@@ -2,43 +2,38 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.UpdateValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
+    private long id = 1L;
 
     @Override
-    public void addFilm(Film film) {
+    public void add(Film film) {
+        film.setId(id);
+        id++;
         films.put(film.getId(), film);
         log.info("Added film {} released in {} .", film.getName(), film.getReleaseDate().getYear());
     }
 
     @Override
-    public Film getFilm(long id) {
-        return films.get(id);
+    public Optional<Film> getById(long id) {
+        return Optional.ofNullable(films.get(id));
     }
 
     @Override
-    public void updateFilm(Film film) {
-        if (!films.containsKey(film.getId()) || film.getId() == null) {
-            UpdateValidationException exception = new UpdateValidationException("There is no such film in database or field \"id\" is empty.");
-            log.error("Error: " + exception.getMessage());
-            throw exception;
-        } else {
-            films.replace(film.getId(), film);
-            log.info("Updated information about film {} released in {} .", film.getName(), film.getReleaseDate().getYear());
-        }
+    public void update(Film film) {
+        films.replace(film.getId(), film);
+        log.info("Updated information about film {} released in {} .", film.getName(), film.getReleaseDate().getYear());
     }
 
     @Override
-    public void deleteFilm(long id) {
+    public void delete(long id) {
         String name = films.get(id).getName();
         LocalDate date = films.get(id).getReleaseDate();
         films.remove(id);
@@ -46,7 +41,19 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Map<Long, Film> getFilms() {
-        return films;
+    public List<Film> getFilms() {
+        return new ArrayList<>(films.values());
+    }
+
+    @Override
+    public boolean checkIsExist(Film film) {
+        boolean isExist = false;
+        for (Film checkingFilm : films.values()) {
+            if (film.getName().equals(checkingFilm.getName()) || film.getReleaseDate().equals(checkingFilm.getReleaseDate())) {
+                isExist = true;
+                break;
+            }
+        }
+        return isExist;
     }
 }
