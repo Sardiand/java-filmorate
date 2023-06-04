@@ -49,7 +49,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public boolean checkIsExist(Film film) {
         boolean isExist = false;
         for (Film checkingFilm : films.values()) {
-            if (film.getName().equals(checkingFilm.getName()) || film.getReleaseDate().equals(checkingFilm.getReleaseDate())) {
+            if (film.getName().equals(checkingFilm.getName()) && film.getReleaseDate().equals(checkingFilm.getReleaseDate())) {
                 isExist = true;
                 break;
             }
