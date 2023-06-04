@@ -10,12 +10,12 @@ import java.util.*;
 @Component
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
-    private long UserId = 1L;
+    private long id = 1L;
 
     @Override
     public void add(User user) {
-        user.setId(UserId);
-        UserId++;
+        user.setId(id);
+        id++;
         users.put(user.getId(), user);
         log.info("Created user {}", user.getName());
     }
