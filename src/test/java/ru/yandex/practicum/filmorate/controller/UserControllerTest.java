@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -100,16 +101,16 @@ class UserControllerTest {
         NullPointerException thrown = assertThrows(NullPointerException.class, () -> controller.updateUser(emptyUser), "NullPointerException was expected.");
         assertEquals("user is marked non-null but is null", thrown.getMessage());
 
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
             controller.updateUser(user);
-        }, "NotFoundException was expected.");
-        assertEquals("There is no such user in database or field \"id\" is empty.", exception.getMessage());
+        }, "BadRequestException was expected.");
+        assertEquals("Field \"id\" of User can't be null.", exception.getMessage());
 
         user.setId(138L);
-        exception = assertThrows(NotFoundException.class, () -> {
+        NotFoundException otherException = assertThrows(NotFoundException.class, () -> {
             controller.updateUser(user);
         }, "NotFoundException was expected.");
-        assertEquals("There is no such user in database or field \"id\" is empty.", exception.getMessage());
+        assertEquals("Not find user by id: " + user.getId(), otherException.getMessage());
     }
 
     private List<String> makeViolationList(Set<ConstraintViolation<User>> validate) {

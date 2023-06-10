@@ -24,7 +24,6 @@ public class InMemoryUserStorage implements UserStorage {
     public void update(User user) {
         users.replace(user.getId(), user);
         log.info("Updated information about user {}", user.getName());
-
     }
 
     @Override
@@ -42,5 +41,17 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public Optional<User> getById(long id) {
         return Optional.ofNullable(users.get(id));
+    }
+
+    @Override
+    public boolean checkIsExist(User user) {
+        boolean isExist = false;
+        for (User checkingUser : users.values()) {
+            if (user.getEmail().equals(checkingUser.getEmail())) {
+                isExist = true;
+                break;
+            }
+        }
+        return isExist;
     }
 }

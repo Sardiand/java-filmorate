@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ObjectExistException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -23,40 +24,28 @@ public class UserService {
     }
 
     public User create(User user) {
-        if (user.getName() == null || user.getName().isBlank() || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
+        if (userStorage.checkIsExist(user)) {
+            throw new ObjectExistException("User with email " + user.getEmail() + " is already exist");
         }
+        user.setNameIfBlank();
         userStorage.add(user);
         return user;
     }
 
     public User update(User user) {
-        if (user.getId() == null || userStorage.getById(user.getId()).isEmpty()) {
-            NotFoundException exception = new NotFoundException("There is no such user in database or field \"id\" is empty.");
-            log.error("UpdateValidationException: " + exception.getMessage());
-            throw exception;
-        }
-        if (user.getName() == null || user.getName().isBlank() || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
+        getById(user.getId());
         userStorage.update(user);
         return user;
     }
 
     public User delete(long id) {
-        if (userStorage.getById(id).isEmpty()) {
-            throw new NotFoundException("There is no such user in the database.");
-        }
-        User user = userStorage.getById(id).get();
+        User user = getById(id);
         userStorage.delete(id);
         return user;
     }
 
     public User getById(long id) {
-        if (userStorage.getById(id).isEmpty()) {
-            throw new NotFoundException("There is no such user in the database.");
-        }
-        return userStorage.getById(id).get();
+        return userStorage.getById(id).orElseThrow(() -> new NotFoundException("Not find user by id: " + id));
     }
 
     public List<User> getUsers() {
@@ -64,29 +53,25 @@ public class UserService {
     }
 
     public void addFriend(long userId, long friendId) {
-        if (userStorage.getById(userId).isEmpty() || userStorage.getById(friendId).isEmpty()) {
-            throw new NotFoundException("There are no one or both users in the database.");
-        } else if (userStorage.getById(userId).get().getFriends().contains(friendId)) {
-            throw new BadRequestException("This user have been already added to friends.");
+        if (getById(userId).getFriends().contains(friendId)) {
+            throw new ObjectExistException("User by id " + friendId + " have been already added to friends.");
         }
-        User user = userStorage.getById(userId).get();
-        User friend = userStorage.getById(friendId).get();
+        User user = getById(userId);
+        User friend = getById(friendId);
 
         user.getFriends().add(friendId);
-        userStorage.update(user);
-
         friend.getFriends().add(userId);
+
+        userStorage.update(user);
         userStorage.update(friend);
     }
 
     public void deleteFriend(long userId, long friendId) {
-        if (userStorage.getById(userId).isEmpty() || userStorage.getById(friendId).isEmpty()) {
-            throw new NotFoundException("There are no one or both users in the database.");
-        } else if (!userStorage.getById(userId).get().getFriends().contains(friendId)) {
-            throw new BadRequestException("This user isn't in your friends list.");
+        if (!getById(userId).getFriends().contains(friendId)) {
+            throw new ObjectExistException("User by id " + friendId + " isn't found in friends list.");
         }
-        User user = userStorage.getById(userId).get();
-        User friend = userStorage.getById(friendId).get();
+        User user = getById(userId);
+        User friend = getById(friendId);
 
         user.getFriends().remove(friendId);
         userStorage.update(user);

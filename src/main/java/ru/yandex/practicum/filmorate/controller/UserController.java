@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -28,6 +29,11 @@ public class UserController {
 
     @PutMapping("/users")
     public User updateUser(@NonNull @RequestBody User user) {
+        if (user.getId() == null) {
+            BadRequestException exception = new BadRequestException("Field \"id\" of User can't be null.");
+            log.error("Error: " + exception.getMessage());
+            throw exception;
+        }
         return userService.update(user);
     }
 

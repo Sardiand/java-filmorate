@@ -33,4 +33,10 @@ public class User {
 
     @EqualsAndHashCode.Exclude
     private final Set<Long> friends = new HashSet<>();
+
+    public void setNameIfBlank() {
+        if (name == null || name.isBlank()) {
+            name = login;
+        }
+    }
 }

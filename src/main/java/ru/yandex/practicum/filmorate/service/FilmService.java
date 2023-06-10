@@ -22,36 +22,26 @@ public class FilmService {
 
     public Film create(Film film) {
         if (filmStorage.checkIsExist(film)) {
-            throw new BadRequestException("This film have already been added.");
+            throw new ObjectExistException("This film have already been added.");
         }
         filmStorage.add(film);
         return film;
     }
 
     public Film update(Film film) {
-        if (film.getId() == null || filmStorage.getById(film.getId()).isEmpty()) {
-            NotFoundException exception = new NotFoundException("There is no such film in database or field \"id\" is empty.");
-            log.error("Error: " + exception.getMessage());
-            throw exception;
-        }
+        getById(film.getId());
         filmStorage.update(film);
         return film;
     }
 
     public Film delete(long id) {
-        if (filmStorage.getById(id).isEmpty()) {
-            throw new NotFoundException("There is no such film in the database.");
-        }
-        Film film = filmStorage.getById(id).get();
+        Film film = getById(id);
         filmStorage.delete(id);
         return film;
     }
 
     public Film getById(long id) {
-        if (filmStorage.getById(id).isEmpty()) {
-            throw new NotFoundException("There is no such film in the database.");
-        }
-        return filmStorage.getById(id).get();
+        return filmStorage.getById(id).orElseThrow(() -> new NotFoundException("Not found film by id: " + id));
     }
 
     public List<Film> getFilms() {
@@ -59,22 +49,16 @@ public class FilmService {
     }
 
     public void addLike(long filmId, long userId) {
-        if (filmStorage.getById(filmId).isEmpty()) {
-            throw new NotFoundException("There is no such film in the database.");
-        }
-        Film film = filmStorage.getById(filmId).get();
-        if (film.getLikes().contains(userId)) {
-            throw new NotFoundException("You have already liked this film.");
+        Film film = getById(filmId);
+        if (getById(filmId).getLikes().contains(userId)) {
+            throw new ObjectExistException("You have already liked this film.");
         }
         film.getLikes().add(userId);
         filmStorage.update(film);
     }
 
     public void deleteLike(long filmId, long userId) {
-        if (filmStorage.getById(filmId).isEmpty()) {
-            throw new NotFoundException("There is no such film in the database.");
-        }
-        Film film = filmStorage.getById(filmId).get();
+        Film film = getById(filmId);
         if (!film.getLikes().contains(userId)) {
             throw new NotFoundException("You haven't liked this film yet.");
         }
@@ -83,9 +67,6 @@ public class FilmService {
     }
 
     public List<Film> getPopular(int count) {
-        if (count <= 0) {
-            throw new IncorrectParameterException("count");
-        }
         List<Film> filmList = filmStorage.getFilms();
         filmList.sort(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()));
         if (filmList.size() > count) {

@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.controller;
 
-
 import javax.validation.Valid;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -30,6 +30,11 @@ public class FilmController {
 
     @PutMapping("/films")
     public Film updateFilm(@NonNull @Valid @RequestBody Film film) {
+        if (film.getId() == null) {
+            BadRequestException exception = new BadRequestException("Field \"id\" of Film can't be null.");
+            log.error("Error: " + exception.getMessage());
+            throw exception;
+        }
         return filmService.update(film);
     }
 
@@ -55,6 +60,9 @@ public class FilmController {
 
     @GetMapping("/films/popular")
     public List<Film> getPopularFilms(@RequestParam(name = "count", defaultValue = "10") int count) {
+        if (count <= 0) {
+            throw new BadRequestException("Parameter \"count\" should be more than zero.");
+        }
         return filmService.getPopular(count);
     }
 

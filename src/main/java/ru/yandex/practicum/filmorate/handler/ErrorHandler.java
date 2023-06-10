@@ -8,14 +8,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
-
 @RestControllerAdvice
 public class ErrorHandler {
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIncorrectParameterException(final IncorrectParameterException e) {
-        return new ErrorResponse(String.format("Error in field \"%s\".", e.getParameter()));
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleObjectExistException(final ObjectExistException e) {
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler

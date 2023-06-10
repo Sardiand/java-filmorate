@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -115,16 +116,16 @@ class FilmControllerTest {
         assertEquals("film is marked non-null but is null", thrown.getMessage());
 
         film.setId(null);
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> {
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
             controller.updateFilm(film);
-        }, "NotFoundException was expected.");
-        assertEquals("There is no such film in database or field \"id\" is empty.", exception.getMessage());
+        }, "BadRequestException was expected.");
+        assertEquals("Field \"id\" of Film can't be null.", exception.getMessage());
 
         film.setId(138L);
-        exception = assertThrows(NotFoundException.class, () -> {
+        NotFoundException otherException = assertThrows(NotFoundException.class, () -> {
             controller.updateFilm(film);
         }, "NotFoundException was expected.");
-        assertEquals("There is no such film in database or field \"id\" is empty.", exception.getMessage());
+        assertEquals("Not found film by id: " + film.getId(), otherException.getMessage());
     }
 
     private List<String> makeViolationList(Set<ConstraintViolation<Film>> validate) {
