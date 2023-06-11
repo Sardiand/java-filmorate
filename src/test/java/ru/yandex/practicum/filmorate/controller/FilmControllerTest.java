@@ -3,7 +3,11 @@ package ru.yandex.practicum.filmorate.controller;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -22,6 +26,7 @@ class FilmControllerTest {
     private static Validator validator;
     private Film film;
     private List<String> violations;
+    private FilmController controller;
 
     @BeforeAll
     static void setValidator() {
@@ -35,6 +40,7 @@ class FilmControllerTest {
         film.setDescription("First film that was made in space. But nobody knows what's the point.");
         film.setReleaseDate(LocalDate.of(2023, 4, 20));
         film.setDuration(164);
+        controller = new FilmController(new FilmService(new InMemoryFilmStorage()));
     }
 
     @Test
@@ -57,7 +63,7 @@ class FilmControllerTest {
 
     @Test
     void checkWrongDescriptionValidation() {
-        byte[] array = new byte[300];
+        byte[] array = new byte[999];
         new Random().nextBytes(array);
         String generatedString = new String(array, StandardCharsets.UTF_8);
         film.setDescription(generatedString);
@@ -95,7 +101,6 @@ class FilmControllerTest {
     @Test
     void checkSendingEmptyRequestForCreationUser() throws NullPointerException {
         Film emptyFilm = null;
-        FilmController controller = new FilmController();
         NullPointerException thrown = assertThrows(NullPointerException.class, () -> {
             controller.createFilm(emptyFilm);
         }, "NullPointerException was expected.");
@@ -103,25 +108,24 @@ class FilmControllerTest {
     }
 
     @Test
-    void checkUpdatingWithEmptyRequestOrWithWrongId() throws ru.yandex.practicum.filmorate.exception.ValidationException {
+    void checkUpdatingWithEmptyRequestOrWithWrongId() {
         Film emptyFilm = null;
-        FilmController controller = new FilmController();
         NullPointerException thrown = assertThrows(NullPointerException.class, () -> {
             controller.updateFilm(emptyFilm);
         }, "NullPointerException was expected.");
         assertEquals("film is marked non-null but is null", thrown.getMessage());
 
         film.setId(null);
-        ru.yandex.practicum.filmorate.exception.ValidationException exception = assertThrows(ru.yandex.practicum.filmorate.exception.ValidationException.class, () -> {
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
             controller.updateFilm(film);
-        }, "ValidationException was expected.");
-        assertEquals("There is no such movie in database or field \"id\" is empty.", exception.getMessage());
+        }, "BadRequestException was expected.");
+        assertEquals("Field \"id\" of Film can't be null.", exception.getMessage());
 
         film.setId(138L);
-        exception = assertThrows(ru.yandex.practicum.filmorate.exception.ValidationException.class, () -> {
+        NotFoundException otherException = assertThrows(NotFoundException.class, () -> {
             controller.updateFilm(film);
-        }, "ValidationException was expected.");
-        assertEquals("There is no such movie in database or field \"id\" is empty.", exception.getMessage());
+        }, "NotFoundException was expected.");
+        assertEquals("Not found film by id: " + film.getId(), otherException.getMessage());
     }
 
     private List<String> makeViolationList(Set<ConstraintViolation<Film>> validate) {

@@ -11,6 +11,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AfterFirstFilmReleaseDate {
     String message() default "Field \"releaseDate\" cannot be earlier than 1895-12-28.";
+
     Class<?>[] groups() default {};
-    Class<? extends Payload> [] payload() default {};
+
+    Class<? extends Payload>[] payload() default {};
 }

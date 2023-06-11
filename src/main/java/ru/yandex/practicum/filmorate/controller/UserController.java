@@ -4,53 +4,71 @@ import javax.validation.Valid;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @Slf4j
 public class UserController {
-    private final Map<Long, User> userMap = new HashMap<>();
-    private long id = 0L;
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/users")
     public User createUser(@NonNull @Valid @RequestBody User user) {
-        id++;
-        user.setId(id);
-        if (user.getName() == null || user.getName().isBlank() || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
-        userMap.put(id, user);
-        log.info("Created user {}", user.getName());
-        return userMap.get(id);
+        return userService.create(user);
     }
 
     @PutMapping("/users")
     public User updateUser(@NonNull @RequestBody User user) {
-        if (!userMap.containsKey(user.getId()) || user.getId() == null) {
-            ValidationException exception = new ValidationException("There is no such user in database or field \"id\" is empty.");
-            log.error("ValidationException: " + exception.getMessage());
+        if (user.getId() == null) {
+            BadRequestException exception = new BadRequestException("Field \"id\" of User can't be null.");
+            log.error("Error: " + exception.getMessage());
             throw exception;
-        } else {
-            if (user.getName() == null || user.getName().isBlank() || user.getName().isEmpty()) {
-                user.setName(user.getLogin());
-            }
-            userMap.replace(id, user);
-            log.info("Updated information about user {}", user.getName());
         }
-        return userMap.get(id);
+        return userService.update(user);
     }
 
     @GetMapping("/users")
     public List<User> getUserList() {
-        List<User> users = new ArrayList<>(userMap.values());
-        log.info("List of users was sent.");
-        return users;
+        return userService.getUsers();
+    }
+
+    @GetMapping("/users/{id}")
+    public User getUser(@PathVariable Long id) {
+        return userService.getById(id);
+    }
+
+    @PutMapping("/users/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable("id") long userId, @PathVariable long friendId) {
+        userService.addFriend(userId, friendId);
+    }
+
+    @DeleteMapping("/users/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        userService.delete(id);
+    }
+
+    @DeleteMapping("/users/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable("id") long userId, @PathVariable long friendId) {
+        userService.deleteFriend(userId, friendId);
+    }
+
+    @GetMapping("/users/{id}/friends")
+    public List<User> getFriends(@PathVariable("id") long userId) {
+        return userService.getFriends(userId);
+    }
+
+    @GetMapping("/users/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable("id") long userId, @PathVariable long otherId) {
+        return userService.getCommonFriends(userId, otherId);
     }
 }
