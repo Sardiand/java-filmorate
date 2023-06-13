@@ -1,22 +1,16 @@
 package ru.yandex.practicum.filmorate.dao.genre;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-
 
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Data
@@ -63,5 +57,4 @@ public class GenreDaoImpl implements GenreDao {
         log.info("Got all genres.");
         return genres;
     }
-
 }

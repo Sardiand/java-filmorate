@@ -31,7 +31,7 @@ public class UserService {
     }
 
     public User update(User user) {
-        if (user.getId() == null || user.getId()<= 0) {
+        if (user.getId() == null || user.getId() <= 0) {
             throw new BadRequestException("Field \"id\" of user is empty or less that 0");
         }
         getById(user.getId());
@@ -54,16 +54,16 @@ public class UserService {
         if (userDbStorage.checkIsFriendshipExist(userId, friendId)) {
             throw new ObjectExistException("User by id " + friendId + " have been already added to friends.");
         }
-        userDbStorage.makeFriendship(userId,friendId);
+        userDbStorage.makeFriendship(userId, friendId);
         log.info("User by id {} made friendship with user by id {}.", userId, friendId);
     }
 
     public void deleteFriend(long userId, long friendId) {
-        checkUsers(userId,friendId);
+        checkUsers(userId, friendId);
         if (!userDbStorage.checkIsFriendshipExist(userId, friendId)) {
             throw new ObjectExistException("User by id " + friendId + " isn't found in friends list.");
         }
-       userDbStorage.finishFriendship(userId, friendId);
+        userDbStorage.finishFriendship(userId, friendId);
         log.info("User by id {} finished friendship with user by id {}.", userId, friendId);
     }
 
@@ -79,7 +79,7 @@ public class UserService {
                 map(this::getById).collect(Collectors.toList());
     }
 
-    private void checkUsers(long userId, long friendId){
+    private void checkUsers(long userId, long friendId) {
         getById(userId);
         getById(friendId);
     }

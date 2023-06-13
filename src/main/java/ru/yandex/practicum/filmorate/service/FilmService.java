@@ -22,7 +22,7 @@ public class FilmService {
     }
 
     public Film create(Film film) {
-      if (filmDbStorage.checkIsFilmExist(film)) {
+        if (filmDbStorage.checkIsFilmExist(film)) {
             throw new ObjectExistException("This film have already been added.");
         }
         Film createdFilm = filmDbStorage.add(film);

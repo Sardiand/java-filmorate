@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 public class FilmMapper implements RowMapper<Film> {
     private final JdbcTemplate jdbcTemplate;
@@ -37,7 +36,7 @@ public class FilmMapper implements RowMapper<Film> {
 
         film.setMpa(mpaRatingDao.get(rating).orElseThrow(() -> new NotFoundException("Not found MPA rating.")));
         if (!filmGenres.isEmpty()) {
-            for(Genre genre: filmGenres){
+            for (Genre genre : filmGenres) {
                 film.getGenres().add(genre);
             }
         }

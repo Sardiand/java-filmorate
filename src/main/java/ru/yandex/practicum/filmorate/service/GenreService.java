@@ -22,7 +22,7 @@ public class GenreService {
         return genreDaoImpl.get(id).orElseThrow(() -> new NotFoundException("Not find genre by id: " + id));
     }
 
-    public List<Genre> getAll(){
+    public List<Genre> getAll() {
         return new ArrayList<>(genreDaoImpl.getAll());
     }
 }

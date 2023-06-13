@@ -17,8 +17,6 @@ import java.sql.Statement;
 import java.util.Optional;
 import java.util.List;
 
-import static java.lang.String.format;
-
 @Slf4j
 @Data
 @Component("userDbStorage")
@@ -40,7 +38,7 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update(con -> {
             PreparedStatement pst = con.prepareStatement(sql,
                     Statement.RETURN_GENERATED_KEYS);
-            pst.setString(1,user.getEmail());
+            pst.setString(1, user.getEmail());
             pst.setString(2, user.getLogin());
             pst.setString(3, user.getName());
             pst.setDate(4, Date.valueOf(user.getBirthday()));
@@ -57,8 +55,8 @@ public class UserDbStorage implements UserStorage {
     @Override
     public void update(User user) {
         jdbcTemplate.update("UPDATE users SET email=?, login=?, name=?, birthday=? WHERE user_id=?",
-                user.getEmail(),user.getLogin(),user.getName(), Date.valueOf(user.getBirthday()), user.getId());
-            jdbcTemplate.update("DELETE FROM user_friendship WHERE from_user_id=?", user.getId());
+                user.getEmail(), user.getLogin(), user.getName(), Date.valueOf(user.getBirthday()), user.getId());
+        jdbcTemplate.update("DELETE FROM user_friendship WHERE from_user_id=?", user.getId());
         if (!user.getFriends().isEmpty()) {
             for (Long i : user.getFriends()) {
                 jdbcTemplate.update("INSERT INTO user_friendship (from_user_id," +

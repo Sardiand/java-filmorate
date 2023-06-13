@@ -19,7 +19,7 @@ public class MpaRatingController {
     }
 
     @GetMapping("/mpa")
-    public List<Mpa> getAllMpaRatings(){
+    public List<Mpa> getAllMpaRatings() {
         return mpaRatingService.getAll();
     }
 

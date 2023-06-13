@@ -23,7 +23,7 @@ import java.util.Optional;
 @Slf4j
 @Data
 @Component("filmDbStorage")
-public class FilmDbStorage implements FilmStorage{
+public class FilmDbStorage implements FilmStorage {
     @Autowired
     private final JdbcTemplate jdbcTemplate;
     private SimpleJdbcInsert jdbcInsert;
@@ -40,7 +40,7 @@ public class FilmDbStorage implements FilmStorage{
             return Optional.empty();
         } else {
             return Optional.of(jdbcTemplate.query("SELECT * FROM film WHERE film_id=" + id,
-                new FilmMapper(jdbcTemplate, new MpaRatingDaoImpl(jdbcTemplate))).get(0));
+                    new FilmMapper(jdbcTemplate, new MpaRatingDaoImpl(jdbcTemplate))).get(0));
         }
     }
 
@@ -49,15 +49,15 @@ public class FilmDbStorage implements FilmStorage{
                 "VALUES(?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
-                    PreparedStatement pst = con.prepareStatement(sql,
-                            Statement.RETURN_GENERATED_KEYS);
-                    pst.setString(1, film.getName());
-                    pst.setString(2, film.getDescription());
-                    pst.setDate(3, Date.valueOf(film.getReleaseDate()));
-                    pst.setInt(4, film.getDuration());
-                    pst.setInt(5, film.getMpa().getId());
-                    return pst;
-                }, keyHolder);
+            PreparedStatement pst = con.prepareStatement(sql,
+                    Statement.RETURN_GENERATED_KEYS);
+            pst.setString(1, film.getName());
+            pst.setString(2, film.getDescription());
+            pst.setDate(3, Date.valueOf(film.getReleaseDate()));
+            pst.setInt(4, film.getDuration());
+            pst.setInt(5, film.getMpa().getId());
+            return pst;
+        }, keyHolder);
         Long filmId = keyHolder.getKey().longValue();
         film.setId(filmId);
         log.info("Added film {} released in {} .", film.getName(), film.getReleaseDate().getYear());
@@ -67,7 +67,7 @@ public class FilmDbStorage implements FilmStorage{
 
     public void update(Film film) {
         jdbcTemplate.update("UPDATE film SET film_title=?, film_description=?, release_date=?, film_duration=?, mpa_rating_id=? "
-                + "WHERE film_id=?", film.getName(), film.getDescription(),Date.valueOf(film.getReleaseDate()),
+                        + "WHERE film_id=?", film.getName(), film.getDescription(), Date.valueOf(film.getReleaseDate()),
                 film.getDuration(), film.getMpa().getId(), film.getId());
         jdbcTemplate.update("DELETE FROM film_genre WHERE film_id=?", film.getId());
         updateGenres(film.getId(), film);
@@ -109,13 +109,12 @@ public class FilmDbStorage implements FilmStorage{
     private void updateGenres(long filmId, Film film) {
         if (!film.getGenres().isEmpty()) {
             List<Genre> genres = new ArrayList<>(film.getGenres());
-            for (Genre genre :genres) {
+            for (Genre genre : genres) {
                 jdbcTemplate.update("INSERT INTO film_genre (film_id, genre_id)" +
                         "VALUES(?, ?)", filmId, genre.getId());
             }
         }
     }
-
 
 
 }

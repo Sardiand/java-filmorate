@@ -15,7 +15,7 @@ import java.util.List;
 @Slf4j
 @Data
 @Component
-public class MpaRatingDaoImpl implements MpaRatingDao{
+public class MpaRatingDaoImpl implements MpaRatingDao {
     private final JdbcTemplate jdbcTemplate;
 
     public MpaRatingDaoImpl(JdbcTemplate jdbcTemplate) {

@@ -64,7 +64,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public boolean checkIsLikeExist(long filmId, long userId){
+    public boolean checkIsLikeExist(long filmId, long userId) {
         return films.get(filmId).getLikes().contains(userId);
     }
 }
