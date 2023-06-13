@@ -2,15 +2,17 @@ package ru.yandex.practicum.filmorate.model;
 
 import javax.validation.constraints.*;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import ru.yandex.practicum.filmorate.validation.AfterFirstFilmReleaseDate;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Film {
     private Long id;
 
@@ -32,6 +34,20 @@ public class Film {
     @Positive(message = "Value of field \"duration\"must be greater than zero.")
     private Integer duration;
 
+    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
+
     @EqualsAndHashCode.Exclude
-    private final Set<Long> likes = new HashSet<>();
+    private Set<Long> likes = new HashSet<>();
+
+    private MpaRating mpaRating;
+
+    private Set<Integer> genres = new HashSet<>();
+
+
 }
