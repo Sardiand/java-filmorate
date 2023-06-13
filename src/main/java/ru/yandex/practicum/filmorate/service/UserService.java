@@ -75,8 +75,8 @@ public class UserService {
 
     public List<User> getCommonFriends(long userId, long otherId) {
         log.info("Got common friends between user by id {} and user by id {}.", userId, otherId);
-        return userDbStorage.getFriends(userId).stream().filter((i) -> userDbStorage.getFriends(otherId).contains(i)).
-                map(this::getById).collect(Collectors.toList());
+        return userDbStorage.getFriends(userId).stream().filter((i) -> userDbStorage.getFriends(otherId).contains(i))
+                .map(this::getById).collect(Collectors.toList());
     }
 
     private void checkUsers(long userId, long friendId) {
