@@ -110,8 +110,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getPopular(int count) {
-        String sql = "SELECT * FROM films AS f " +
-                "LEFT OUTER JOIN film_likes fl on f.film_id = fl.film_id " +
+        String sql = "SELECT * FROM film AS f " +
+                "LEFT OUTER JOIN film_like fl on f.film_id = fl.film_id " +
                 "GROUP BY f.film_id " +
                 "ORDER BY COUNT(fl.film_id) " +
                 "DESC LIMIT ?";
