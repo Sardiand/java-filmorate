@@ -34,6 +34,15 @@ public class Film {
     @Positive(message = "Value of field \"duration\"must be greater than zero.")
     private Integer duration;
 
+    public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration, Mpa mpa) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.mpa = mpa;
+    }
+
     public Film(Long id, String name, String description, LocalDate releaseDate, Integer duration) {
         this.id = id;
         this.name = name;
@@ -45,9 +54,9 @@ public class Film {
     @EqualsAndHashCode.Exclude
     private Set<Long> likes = new HashSet<>();
 
-    private MpaRating mpaRating;
+    private Mpa mpa;
 
-    private Set<Integer> genres = new HashSet<>();
+    private Set<Genre> genres = new HashSet<>();
 
 
 }

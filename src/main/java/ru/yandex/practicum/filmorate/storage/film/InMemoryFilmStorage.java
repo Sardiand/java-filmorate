@@ -59,6 +59,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         films.get(filmId).getLikes().remove(userId);
     }
 
+    public List<Long> getLikes(long filmId) {
+        return new ArrayList<>(films.get(filmId).getLikes());
+    }
+
     @Override
     public boolean checkIsLikeExist(long filmId, long userId){
         return films.get(filmId).getLikes().contains(userId);

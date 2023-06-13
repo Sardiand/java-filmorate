@@ -2,13 +2,20 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.film.FilmMapper;
 import ru.yandex.practicum.filmorate.dao.mpa.MpaRatingDaoImpl;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,12 +24,15 @@ import java.util.Optional;
 @Data
 @Component("filmDbStorage")
 public class FilmDbStorage implements FilmStorage{
+    @Autowired
     private final JdbcTemplate jdbcTemplate;
+    private SimpleJdbcInsert jdbcInsert;
 
-
-    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    @Autowired
+    private void setJdbcInsert(JdbcTemplate jdbcTemplate) {
+        jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
     }
+
 
     public Optional<Film> getById(long id) {
         if (jdbcTemplate.query("SELECT * FROM film WHERE film_id=" + id, new FilmMapper(jdbcTemplate,
@@ -35,26 +45,30 @@ public class FilmDbStorage implements FilmStorage{
     }
 
     public Film add(Film film) {
-        jdbcTemplate.update("INSERT INTO film (film_title, film_description, release_date, film_duration, mpa_rating_id)" +
-                "VALUES(?, ?, ?, ?, ?)",film.getName(), film.getDescription(), Date.valueOf(film.getReleaseDate()),
-                film.getDuration(), film.getMpaRating().getId());
+        String sql = "INSERT INTO film (film_title, film_description, release_date, film_duration, mpa_rating_id)" +
+                "VALUES(?, ?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(con -> {
+                    PreparedStatement pst = con.prepareStatement(sql,
+                            Statement.RETURN_GENERATED_KEYS);
+                    pst.setString(1, film.getName());
+                    pst.setString(2, film.getDescription());
+                    pst.setDate(3, Date.valueOf(film.getReleaseDate()));
+                    pst.setInt(4, film.getDuration());
+                    pst.setInt(5, film.getMpa().getId());
+                    return pst;
+                }, keyHolder);
+        Long filmId = keyHolder.getKey().longValue();
+        film.setId(filmId);
         log.info("Added film {} released in {} .", film.getName(), film.getReleaseDate().getYear());
 
-        String resultQuery = "SELECT * FROM film WHERE film_title=" + film.getName() +
-                " AND film_description=" + film.getDescription() +
-                " AND release_date=" + Date.valueOf(film.getReleaseDate()) +
-                " AND film_duration=" + film.getDuration() +
-                " AND mpa_rating_id=" + film.getMpaRating().getId();
-
-        Film addedFilm = jdbcTemplate.query(resultQuery, new FilmMapper(jdbcTemplate, new MpaRatingDaoImpl(jdbcTemplate))).get(0);
-        updateGenres(addedFilm.getId(), film);
-        return (jdbcTemplate.query(resultQuery, new FilmMapper(jdbcTemplate, new MpaRatingDaoImpl(jdbcTemplate))).get(0));
+        return film;
     }
 
     public void update(Film film) {
         jdbcTemplate.update("UPDATE film SET film_title=?, film_description=?, release_date=?, film_duration=?, mpa_rating_id=? "
                 + "WHERE film_id=?", film.getName(), film.getDescription(),Date.valueOf(film.getReleaseDate()),
-                film.getDuration(), film.getMpaRating().getId());
+                film.getDuration(), film.getMpa().getId(), film.getId());
         jdbcTemplate.update("DELETE FROM film_genre WHERE film_id=?", film.getId());
         updateGenres(film.getId(), film);
         log.info("Updated film {} with id {} .", film.getName(), film.getId());
@@ -77,6 +91,11 @@ public class FilmDbStorage implements FilmStorage{
         log.info("Like from user with user_id {} to film with film_id {} was deleted.", userId, filmId);
     }
 
+    public List<Long> getLikes(long filmId) {
+        return jdbcTemplate.queryForList("SELECT user_id FROM film_like WHERE film_id = ?",
+                Long.class, filmId);
+    }
+
     public boolean checkIsLikeExist(long filmId, long userId) {
         return jdbcTemplate.queryForRowSet("SELECT * FROM film_like WHERE film_id=? AND user_id=?",
                 filmId, userId).next();
@@ -89,12 +108,14 @@ public class FilmDbStorage implements FilmStorage{
 
     private void updateGenres(long filmId, Film film) {
         if (!film.getGenres().isEmpty()) {
-            List<Integer> genres = new ArrayList<>(film.getGenres());
-            for (Integer genreId :genres) {
+            List<Genre> genres = new ArrayList<>(film.getGenres());
+            for (Genre genre :genres) {
                 jdbcTemplate.update("INSERT INTO film_genre (film_id, genre_id)" +
-                        "VALUES(?, ?)", filmId, genreId);
+                        "VALUES(?, ?)", filmId, genre.getId());
             }
         }
     }
+
+
 
 }

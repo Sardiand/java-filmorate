@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -23,10 +23,10 @@ public class MpaRatingDaoImpl implements MpaRatingDao{
     }
 
     @Override
-    public Optional<MpaRating> get(int id) {
+    public Optional<Mpa> get(int id) {
         SqlRowSet ratingRow = jdbcTemplate.queryForRowSet("SELECT * FROM mpa_rating WHERE mpa_rating_id=?", id);
         if (ratingRow.next()) {
-            MpaRating rating = new MpaRating(ratingRow.getInt("mpa_rating_id"),
+            Mpa rating = new Mpa(ratingRow.getInt("mpa_rating_id"),
                     Objects.requireNonNull(ratingRow.getString("rating")));
             log.info("Found rating MPA {} by id {}.", rating.getName(), id);
             return Optional.of(rating);
@@ -37,8 +37,8 @@ public class MpaRatingDaoImpl implements MpaRatingDao{
     }
 
     @Override
-    public Collection<MpaRating> getAll() {
-        List<MpaRating> ratings = jdbcTemplate.query("SELECT * FROM mpa_rating ORDER BY mpa_rating_id",
+    public Collection<Mpa> getAll() {
+        List<Mpa> ratings = jdbcTemplate.query("SELECT * FROM mpa_rating ORDER BY mpa_rating_id",
                 new MpaRatingMapper());
         log.info("Got all ratings MPA.");
         return ratings;

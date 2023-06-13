@@ -24,4 +24,6 @@ public interface FilmStorage {
     void removeLike(long filmId, long userId);
 
     boolean checkIsLikeExist(long filmId, long userId);
+
+    List<Long> getLikes(long id);
 }

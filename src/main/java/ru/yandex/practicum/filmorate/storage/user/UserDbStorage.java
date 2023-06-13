@@ -2,12 +2,18 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.user.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.Optional;
 import java.util.List;
 
@@ -17,16 +23,35 @@ import static java.lang.String.format;
 @Data
 @Component("userDbStorage")
 public class UserDbStorage implements UserStorage {
+
     private final JdbcTemplate jdbcTemplate;
+    private SimpleJdbcInsert jdbcInsert;
+
+    @Autowired
+    private void setJdbcInset(JdbcTemplate jdbcTemplate) {
+        jdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
+    }
 
     @Override
     public User add(User user) {
-        jdbcTemplate.update("INSERT INTO users (email, login, name, birthday) VALUES(?, ?, ?, ?)",
-                user.getEmail(), user.getLogin(), user.getName(), Date.valueOf(user.getBirthday()));
+        String sql = "INSERT INTO users (email, login, name, birthday) VALUES(?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(con -> {
+            PreparedStatement pst = con.prepareStatement(sql,
+                    Statement.RETURN_GENERATED_KEYS);
+            pst.setString(1,user.getEmail());
+            pst.setString(2, user.getLogin());
+            pst.setString(3, user.getName());
+            pst.setDate(4, Date.valueOf(user.getBirthday()));
+            return pst;
+        }, keyHolder);
+
+        Long userId = keyHolder.getKey().longValue();
+        user.setId(userId);
         log.info("Added new user - {}.", user.getName());
-        String resultQuery = format("SELECT * FROM users WHERE email='%s' AND login='%s' AND" +
-                " name='%s' AND birthday='%s'", user.getEmail(), user.getLogin(),user.getName(), Date.valueOf(user.getBirthday()));
-        return jdbcTemplate.query(resultQuery, new UserMapper()).get(0);
+
+        return user;
     }
 
     @Override
@@ -69,8 +94,8 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<Long> getFriends(long id) {
-        return jdbcTemplate.queryForList("SELECT to_user_id FROM user_friendship ORDER BY to_user_id",
-                Long.class);
+        return jdbcTemplate.queryForList("SELECT to_user_id FROM user_friendship WHERE from_user_id="
+                + id + " ORDER BY to_user_id", Long.class);
     }
 
     @Override

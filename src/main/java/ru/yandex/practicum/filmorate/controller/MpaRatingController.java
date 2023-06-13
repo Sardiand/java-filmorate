@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.model.MpaRating;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.MpaRatingService;
 
 import java.util.List;
@@ -19,12 +19,12 @@ public class MpaRatingController {
     }
 
     @GetMapping("/mpa")
-    public List<MpaRating> getAllMpaRatings(){
+    public List<Mpa> getAllMpaRatings(){
         return mpaRatingService.getAll();
     }
 
-    @GetMapping("/mpa/{}")
-    public MpaRating getMpaRatingById(@PathVariable int id) {
+    @GetMapping("/mpa/{id}")
+    public Mpa getMpaRatingById(@PathVariable int id) {
         return mpaRatingService.getById(id);
     }
 }
