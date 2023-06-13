@@ -60,6 +60,7 @@ public class FilmDbStorage implements FilmStorage {
             return pst;
         }, keyHolder);
         Long filmId = keyHolder.getKey().longValue();
+        updateGenres(filmId, film);
         film.setId(filmId);
         log.info("Added film {} released in {} .", film.getName(), film.getReleaseDate().getYear());
 
