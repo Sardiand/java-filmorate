@@ -62,13 +62,6 @@ public class FilmService {
     }
 
     public List<Film> getPopular(int count) {
-        List<Film> filmList = filmDbStorage.getFilms();
-        filmList.sort(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()));
-        if (filmList.size() > count) {
-            return filmList.subList(0, count);
-        } else {
-            return filmList;
-        }
+            return filmDbStorage.getPopular(count);
     }
-
 }

@@ -38,6 +38,17 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> getPopular(int count) {
+        List<Film> filmList = getFilms();
+        filmList.sort(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()));
+        if (filmList.size() > count) {
+            return filmList.subList(0, count);
+        } else {
+            return filmList;
+        }
+    }
+
+    @Override
     public boolean checkIsFilmExist(Film film) {
         boolean isExist = false;
         for (Film checkingFilm : films.values()) {
