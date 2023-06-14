@@ -6,8 +6,10 @@ import lombok.*;
 import ru.yandex.practicum.filmorate.validation.AfterFirstFilmReleaseDate;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 
 @Data
@@ -56,7 +58,7 @@ public class Film {
 
     private Mpa mpa;
 
-    private Set<Genre> genres = new HashSet<>();
+    private Set<Genre> genres = new TreeSet<>(Comparator.comparing(Genre::getId, Comparator.naturalOrder()));
 
 
 }

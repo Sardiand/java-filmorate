@@ -132,10 +132,4 @@ public class FilmDbStorage implements FilmStorage {
             }
         }
     }
-
-    private void setMpa(Film film) {
-
-    }
-
-
 }

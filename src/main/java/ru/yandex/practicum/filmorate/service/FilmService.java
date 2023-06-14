@@ -51,7 +51,10 @@ public class FilmService {
 
     public Film getById(long id) {
         Film film = filmDbStorage.findById(id).orElseThrow(() -> new NotFoundException("Not found film by id: " + id));
-        getGenres(id).forEach(g -> film.getGenres().add(g));
+
+        List<Genre> genres = getGenres(id);
+        genres.forEach(g -> film.getGenres().add(g));
+        genres.sort(Comparator.comparing(Genre::getId, Comparator.naturalOrder()));
         film.setMpa(mpaRatingDaoImpl.get(film.getMpa().getId())
                 .orElseThrow(() -> new NotFoundException("Not found rating MPA by id: " + film.getMpa().getId())));
         return film;
@@ -59,27 +62,7 @@ public class FilmService {
 
     public List<Film> getFilms() {
         List<Film> films = filmDbStorage.findFilms();
-
-        List<Mpa> mpaList = mpaRatingDaoImpl.getAll();
-        Map<Integer, Mpa> mpaMap = new HashMap<>();
-
-        for (Mpa mpa : mpaList) {
-            mpaMap.put(mpa.getId(), mpa);
-        }
-        films.forEach(f -> f.setMpa(mpaMap.get(f.getMpa().getId())));
-
-        String filmIds = films.stream()
-                .map(Film::getId)
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
-        final Map<Long, Film> filmById = films.stream().collect(Collectors.toMap(Film::getId, identity()));
-        final String sqlQuery = "SELECT * FROM genre gr," +
-                " film_genre fgr WHERE fgr.genre_id = gr.genre_id AND fgr.film_id IN (" + filmIds + ")";
-        jdbcTemplate.query(sqlQuery, (rs) -> {
-            final Film film = filmById.get(rs.getLong("film_id"));
-            film.getGenres().add(new Genre(rs.getInt("genre_id"), rs.getString("name")));
-        });
-
+        setMpaAndGenresForFilms(films);
         return films;
     }
 
@@ -100,12 +83,36 @@ public class FilmService {
     }
 
     public List<Film> getPopular(int count) {
-        return filmDbStorage.findPopular(count);
+        List<Film> films = filmDbStorage.findPopular(count);
+        setMpaAndGenresForFilms(films);
+        return films;
     }
 
     private List<Genre> getGenres(long filmId) {
         return jdbcTemplate.query("SELECT fg.genre_id, genre.name FROM film_genre AS fg LEFT OUTER JOIN " +
                 "genre ON fg.genre_id=genre.genre_id WHERE film_id=" +
                 filmId, new GenreMapper());
+    }
+
+    private void setMpaAndGenresForFilms(List<Film> films) {
+        List<Mpa> mpaList = mpaRatingDaoImpl.getAll();
+        Map<Integer, Mpa> mpaMap = new HashMap<>();
+
+        for (Mpa mpa : mpaList) {
+            mpaMap.put(mpa.getId(), mpa);
+        }
+        films.forEach(f -> f.setMpa(mpaMap.get(f.getMpa().getId())));
+
+        String filmIds = films.stream()
+                .map(Film::getId)
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+        final Map<Long, Film> filmById = films.stream().collect(Collectors.toMap(Film::getId, identity()));
+        final String sqlQuery = "SELECT * FROM genre gr," +
+                " film_genre fgr WHERE fgr.genre_id = gr.genre_id AND fgr.film_id IN (" + filmIds + ")";
+        jdbcTemplate.query(sqlQuery, (rs) -> {
+            final Film film = filmById.get(rs.getLong("film_id"));
+            film.getGenres().add(new Genre(rs.getInt("genre_id"), rs.getString("name")));
+        });
     }
 }
