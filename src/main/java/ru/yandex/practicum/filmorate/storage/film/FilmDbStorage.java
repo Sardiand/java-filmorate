@@ -38,7 +38,8 @@ public class FilmDbStorage implements FilmStorage {
         if (jdbcTemplate.query(sql, new FilmMapper()).isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(jdbcTemplate.query(sql, new FilmMapper()).get(0));
+            Film film = jdbcTemplate.query(sql, new FilmMapper()).get(0);
+            return Optional.of(film);
         }
     }
 
@@ -130,6 +131,10 @@ public class FilmDbStorage implements FilmStorage {
                         "VALUES(?, ?)", filmId, genre.getId());
             }
         }
+    }
+
+    private void setMpa(Film film) {
+
     }
 
 

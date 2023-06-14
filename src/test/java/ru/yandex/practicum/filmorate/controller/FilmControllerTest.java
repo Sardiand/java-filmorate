@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
+import ru.yandex.practicum.filmorate.dao.mpa.MpaRatingDaoImpl;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -41,7 +42,7 @@ class FilmControllerTest {
         film.setDescription("First film that was made in space. But nobody knows what's the point.");
         film.setReleaseDate(LocalDate.of(2023, 4, 20));
         film.setDuration(164);
-        controller = new FilmController(new FilmService(new JdbcTemplate(), new InMemoryFilmStorage()));
+        controller = new FilmController(new FilmService(new JdbcTemplate(), new InMemoryFilmStorage(), new MpaRatingDaoImpl(new JdbcTemplate())));
     }
 
     @Test

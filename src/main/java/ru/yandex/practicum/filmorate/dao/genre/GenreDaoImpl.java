@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.dao.genre;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Genre;
 
@@ -22,15 +21,14 @@ public class GenreDaoImpl implements GenreDao {
 
     @Override
     public Optional<Genre> get(int id) {
-        SqlRowSet ratingRow = jdbcTemplate.queryForRowSet("SELECT * FROM genre WHERE genre_id=?", id);
-        if (ratingRow.next()) {
-            Genre genre = new Genre(ratingRow.getInt("genre_id"),
-                    ratingRow.getString("name"));
-            log.info("Found genre {} by id {}.", id, genre.getName());
-            return Optional.of(genre);
-        } else {
+        String sql = "SELECT * FROM genre WHERE genre_id=?";
+        if (jdbcTemplate.query(sql, new GenreMapper(), id).isEmpty()) {
             log.info("Genre by id {} is not found.", id);
             return Optional.empty();
+        } else {
+            Genre genre = jdbcTemplate.query(sql, new GenreMapper(), id).get(0);
+            log.info("Found genre {} by id {}.", id, genre.getName());
+            return Optional.of(genre);
         }
     }
 

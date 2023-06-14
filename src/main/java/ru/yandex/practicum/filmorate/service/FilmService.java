@@ -1,13 +1,17 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.genre.GenreMapper;
+import ru.yandex.practicum.filmorate.dao.mpa.MpaRatingDao;
 import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.*;
@@ -17,17 +21,17 @@ import static java.util.function.UnaryOperator.identity;
 
 @Slf4j
 @Service
+@Data
 public class FilmService {
-
+    @Autowired
     private final JdbcTemplate jdbcTemplate;
 
     @Qualifier("filmDbStorage")
     private final FilmStorage filmDbStorage;
 
-    public FilmService(JdbcTemplate jdbcTemplate, FilmStorage filmDbStorage) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.filmDbStorage = filmDbStorage;
-    }
+    @Autowired
+    private final MpaRatingDao mpaRatingDaoImpl;
+
 
     public Film create(Film film) {
         if (filmDbStorage.checkIsFilmExist(film)) {
@@ -48,11 +52,21 @@ public class FilmService {
     public Film getById(long id) {
         Film film = filmDbStorage.findById(id).orElseThrow(() -> new NotFoundException("Not found film by id: " + id));
         getGenres(id).forEach(g -> film.getGenres().add(g));
+        film.setMpa(mpaRatingDaoImpl.get(film.getMpa().getId())
+                .orElseThrow(() -> new NotFoundException("Not found rating MPA by id: " + film.getMpa().getId())));
         return film;
     }
 
     public List<Film> getFilms() {
         List<Film> films = filmDbStorage.findFilms();
+
+        List<Mpa> mpaList = mpaRatingDaoImpl.getAll();
+        Map<Integer, Mpa> mpaMap = new HashMap<>();
+
+        for (Mpa mpa : mpaList) {
+            mpaMap.put(mpa.getId(), mpa);
+        }
+        films.forEach(f -> f.setMpa(mpaMap.get(f.getMpa().getId())));
 
         String filmIds = films.stream()
                 .map(Film::getId)

@@ -46,7 +46,6 @@ class FilmDbStorageTest {
 
         assertEquals(1L, filmDbStorage.findFilms().size());
 
-        assertEquals("R", filmDbStorage.findById(1).get().getMpa().getName());
         assertEquals("Man", filmDbStorage.findById(1).get().getName());
         assertEquals(121, filmDbStorage.findById(1).get().getDuration());
     }
