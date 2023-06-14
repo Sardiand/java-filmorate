@@ -7,8 +7,6 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
-import java.util.Collection;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.List;
 
@@ -37,7 +35,7 @@ public class MpaRatingDaoImpl implements MpaRatingDao {
     }
 
     @Override
-    public Collection<Mpa> getAll() {
+    public List<Mpa> getAll() {
         List<Mpa> ratings = jdbcTemplate.query("SELECT * FROM mpa_rating ORDER BY mpa_rating_id",
                 new MpaRatingMapper());
         log.info("Got all ratings MPA.");

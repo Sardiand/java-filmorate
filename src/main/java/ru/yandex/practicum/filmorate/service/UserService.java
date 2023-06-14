@@ -31,9 +31,6 @@ public class UserService {
     }
 
     public User update(User user) {
-        if (user.getId() == null || user.getId() <= 0) {
-            throw new BadRequestException("Field \"id\" of user is empty or less that 0");
-        }
         getById(user.getId());
         user.setNameIfBlank();
         userDbStorage.update(user);
