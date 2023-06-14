@@ -15,75 +15,68 @@ import java.util.stream.Collectors;
 @Component
 public class UserService {
 
-    private final UserStorage userStorage;
-
     @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    private final UserStorage userDbStorage;
+
+    public UserService(UserStorage userDbStorage) {
+        this.userDbStorage = userDbStorage;
     }
 
     public User create(User user) {
-        if (userStorage.checkIsExist(user)) {
-            throw new ObjectExistException("User with email " + user.getEmail() + " is already exist");
-        }
         user.setNameIfBlank();
-        userStorage.add(user);
-        return user;
+        User newUser = userDbStorage.add(user);
+        log.info("Created new user {} with id {}.", newUser.getName(), newUser.getId());
+        return newUser;
     }
 
     public User update(User user) {
         getById(user.getId());
-        userStorage.update(user);
-        return user;
-    }
-
-    public User delete(long id) {
-        User user = getById(id);
-        userStorage.delete(id);
+        user.setNameIfBlank();
+        userDbStorage.update(user);
+        log.info("Updated information about user {} with id {}.", user.getId(), user.getName());
         return user;
     }
 
     public User getById(long id) {
-        return userStorage.getById(id).orElseThrow(() -> new NotFoundException("Not find user by id: " + id));
+        return userDbStorage.getById(id).orElseThrow(() -> new NotFoundException("Not find user by id: " + id));
     }
 
     public List<User> getUsers() {
-        return userStorage.getUsers();
+        return userDbStorage.findUsers();
     }
 
     public void addFriend(long userId, long friendId) {
-        if (getById(userId).getFriends().contains(friendId)) {
+        checkUsers(userId, friendId);
+        if (userDbStorage.checkIsFriendshipExist(userId, friendId)) {
             throw new ObjectExistException("User by id " + friendId + " have been already added to friends.");
         }
-        User user = getById(userId);
-        User friend = getById(friendId);
-
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
-
-        userStorage.update(user);
-        userStorage.update(friend);
+        userDbStorage.makeFriendship(userId, friendId);
+        log.info("User by id {} made friendship with user by id {}.", userId, friendId);
     }
 
     public void deleteFriend(long userId, long friendId) {
-        if (!getById(userId).getFriends().contains(friendId)) {
+        checkUsers(userId, friendId);
+        if (!userDbStorage.checkIsFriendshipExist(userId, friendId)) {
             throw new ObjectExistException("User by id " + friendId + " isn't found in friends list.");
         }
-        User user = getById(userId);
-        User friend = getById(friendId);
-
-        user.getFriends().remove(friendId);
-        userStorage.update(user);
-
-        friend.getFriends().remove(userId);
-        userStorage.update(friend);
+        userDbStorage.finishFriendship(userId, friendId);
+        log.info("User by id {} finished friendship with user by id {}.", userId, friendId);
     }
 
     public List<User> getFriends(long userId) {
-        return getById(userId).getFriends().stream().map(this::getById).collect(Collectors.toList());
+        getById(userId);
+        log.info("Got friends of user with id {}.", userId);
+        return userDbStorage.findFriends(userId).stream().map(this::getById).collect(Collectors.toList());
     }
 
     public List<User> getCommonFriends(long userId, long otherId) {
-        return getById(userId).getFriends().stream().filter((i) -> getById(otherId).getFriends().contains(i)).map(this::getById).collect(Collectors.toList());
+        log.info("Got common friends between user by id {} and user by id {}.", userId, otherId);
+        return userDbStorage.findFriends(userId).stream().filter((i) -> userDbStorage.findFriends(otherId).contains(i))
+                .map(this::getById).collect(Collectors.toList());
+    }
+
+    private void checkUsers(long userId, long friendId) {
+        getById(userId);
+        getById(friendId);
     }
 }

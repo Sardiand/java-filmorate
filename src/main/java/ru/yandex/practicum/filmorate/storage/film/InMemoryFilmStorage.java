@@ -1,52 +1,55 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import lombok.extern.slf4j.Slf4j;
+
+import lombok.Data;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.LocalDate;
 import java.util.*;
 
-@Slf4j
-@Component
+
+@Component("memoryFilmStorage")
+@Data
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
-    private long id = 1L;
+    private long id = 0L;
 
     @Override
-    public void add(Film film) {
-        film.setId(id);
+    public Film add(Film film) {
         id++;
+        film.setId(id);
         films.put(film.getId(), film);
-        log.info("Added film {} released in {} .", film.getName(), film.getReleaseDate().getYear());
+        return films.get(id);
     }
 
     @Override
-    public Optional<Film> getById(long id) {
+    public Optional<Film> findById(long id) {
         return Optional.ofNullable(films.get(id));
     }
 
     @Override
     public void update(Film film) {
         films.replace(film.getId(), film);
-        log.info("Updated information about film {} released in {} .", film.getName(), film.getReleaseDate().getYear());
     }
 
     @Override
-    public void delete(long id) {
-        String name = films.get(id).getName();
-        LocalDate date = films.get(id).getReleaseDate();
-        films.remove(id);
-        log.info("Film {} released in {} was deleted.", name, date);
-    }
-
-    @Override
-    public List<Film> getFilms() {
+    public List<Film> findFilms() {
         return new ArrayList<>(films.values());
     }
 
     @Override
-    public boolean checkIsExist(Film film) {
+    public List<Film> findPopular(int count) {
+        List<Film> filmList = findFilms();
+        filmList.sort(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()));
+        if (filmList.size() > count) {
+            return filmList.subList(0, count);
+        } else {
+            return filmList;
+        }
+    }
+
+    @Override
+    public boolean checkIsFilmExist(Film film) {
         boolean isExist = false;
         for (Film checkingFilm : films.values()) {
             if (film.getName().equals(checkingFilm.getName()) && film.getReleaseDate().equals(checkingFilm.getReleaseDate())) {
@@ -55,5 +58,24 @@ public class InMemoryFilmStorage implements FilmStorage {
             }
         }
         return isExist;
+    }
+
+    @Override
+    public void putLike(long filmId, long userId) {
+        films.get(filmId).getLikes().add(userId);
+    }
+
+    @Override
+    public void removeLike(long filmId, long userId) {
+        films.get(filmId).getLikes().remove(userId);
+    }
+
+    public List<Long> findLikes(long filmId) {
+        return new ArrayList<>(films.get(filmId).getLikes());
+    }
+
+    @Override
+    public boolean checkIsLikeExist(long filmId, long userId) {
+        return films.get(filmId).getLikes().contains(userId);
     }
 }

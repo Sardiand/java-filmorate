@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-
 import java.util.List;
 
 @Slf4j
@@ -51,11 +50,6 @@ public class FilmController {
     @DeleteMapping("/films/{id}/like/{userId}")
     public void deleteLike(@PathVariable("id") Long filmId, @PathVariable Long userId) {
         filmService.deleteLike(filmId, userId);
-    }
-
-    @DeleteMapping("/films/{id}")
-    public void deleteFilm(@PathVariable Long id) {
-        filmService.delete(id);
     }
 
     @GetMapping("/films/popular")
