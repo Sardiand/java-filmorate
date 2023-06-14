@@ -33,7 +33,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> getById(long id) {
+    public Optional<Film> findById(long id) {
         String sql = "SELECT * FROM film WHERE film_id=" + id;
         if (jdbcTemplate.query(sql, new FilmMapper()).isEmpty()) {
             return Optional.empty();
@@ -76,7 +76,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getFilms() {
+    public List<Film> findFilms() {
         List<Film> films = jdbcTemplate.query("SELECT * FROM film ORDER BY film_id", new FilmMapper());
         log.info("Got all films.");
         return films;
@@ -95,7 +95,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Long> getLikes(long filmId) {
+    public List<Long> findLikes(long filmId) {
         return jdbcTemplate.queryForList("SELECT user_id FROM film_like WHERE film_id = ?",
                 Long.class, filmId);
     }
@@ -107,7 +107,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getPopular(int count) {
+    public List<Film> findPopular(int count) {
         String sql = "SELECT * FROM film AS f " +
                 "LEFT OUTER JOIN film_like fl on f.film_id = fl.film_id " +
                 "GROUP BY f.film_id " +

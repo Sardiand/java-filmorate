@@ -15,11 +15,11 @@ public interface FilmStorage {
 
     boolean checkIsFilmExist(Film film);
 
-    List<Film> getFilms();
+    List<Film> findFilms();
 
-    Optional<Film> getById(long id);
+    Optional<Film> findById(long id);
 
-    List<Film> getPopular(int count);
+    List<Film> findPopular(int count);
 
     void putLike(long filmId, long userId);
 
@@ -27,5 +27,5 @@ public interface FilmStorage {
 
     boolean checkIsLikeExist(long filmId, long userId);
 
-    List<Long> getLikes(long id);
+    List<Long> findLikes(long id);
 }

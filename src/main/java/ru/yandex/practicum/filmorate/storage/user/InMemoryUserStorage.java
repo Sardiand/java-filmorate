@@ -28,7 +28,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public List<User> getUsers() {
+    public List<User> findUsers() {
         return new ArrayList<>(users.values());
     }
 
@@ -55,7 +55,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public List<Long> getFriends(long id) {
+    public List<Long> findFriends(long id) {
         return new ArrayList<>(users.get(id).getFriends());
     }
 }

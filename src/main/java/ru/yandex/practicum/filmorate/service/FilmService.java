@@ -1,8 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -49,13 +46,13 @@ public class FilmService {
     }
 
     public Film getById(long id) {
-        Film film = filmDbStorage.getById(id).orElseThrow(() -> new NotFoundException("Not found film by id: " + id));
+        Film film = filmDbStorage.findById(id).orElseThrow(() -> new NotFoundException("Not found film by id: " + id));
         getGenres(id).forEach(g -> film.getGenres().add(g));
         return film;
     }
 
     public List<Film> getFilms() {
-        List<Film> films = filmDbStorage.getFilms();
+        List<Film> films = filmDbStorage.findFilms();
 
         String filmIds = films.stream()
                 .map(Film::getId)
@@ -89,7 +86,7 @@ public class FilmService {
     }
 
     public List<Film> getPopular(int count) {
-        return filmDbStorage.getPopular(count);
+        return filmDbStorage.findPopular(count);
     }
 
     private List<Genre> getGenres(long filmId) {

@@ -72,7 +72,7 @@ class UserDbStorageTest {
                 LocalDate.of(1999, 2, 5));
         userDbStorage.add(first);
         userDbStorage.add(second);
-        List<User> users = userDbStorage.getUsers();
+        List<User> users = userDbStorage.findUsers();
 
         assertEquals(2, users.size());
         assertEquals("Den", users.get(1).getLogin());
@@ -88,13 +88,13 @@ class UserDbStorageTest {
         userDbStorage.add(second);
         userDbStorage.makeFriendship(1,2);
 
-        List<Long> friends = userDbStorage.getFriends(1);
+        List<Long> friends = userDbStorage.findFriends(1);
 
         assertEquals(1, friends.size());
         assertEquals(2, friends.get(0));
 
         userDbStorage.finishFriendship(1,2);
-        friends = userDbStorage.getFriends(1);
+        friends = userDbStorage.findFriends(1);
 
         assertTrue(friends.isEmpty());
     }

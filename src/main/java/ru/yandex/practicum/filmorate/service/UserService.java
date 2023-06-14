@@ -46,7 +46,7 @@ public class UserService {
     }
 
     public List<User> getUsers() {
-        return userDbStorage.getUsers();
+        return userDbStorage.findUsers();
     }
 
     public void addFriend(long userId, long friendId) {
@@ -70,12 +70,12 @@ public class UserService {
     public List<User> getFriends(long userId) {
         getById(userId);
         log.info("Got friends of user with id {}.", userId);
-        return userDbStorage.getFriends(userId).stream().map(this::getById).collect(Collectors.toList());
+        return userDbStorage.findFriends(userId).stream().map(this::getById).collect(Collectors.toList());
     }
 
     public List<User> getCommonFriends(long userId, long otherId) {
         log.info("Got common friends between user by id {} and user by id {}.", userId, otherId);
-        return userDbStorage.getFriends(userId).stream().filter((i) -> userDbStorage.getFriends(otherId).contains(i))
+        return userDbStorage.findFriends(userId).stream().filter((i) -> userDbStorage.findFriends(otherId).contains(i))
                 .map(this::getById).collect(Collectors.toList());
     }
 

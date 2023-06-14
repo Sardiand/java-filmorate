@@ -32,7 +32,7 @@ class FilmDbStorageTest {
 
         filmDbStorage.add(film);
 
-        Film newFilm = filmDbStorage.getById(film.getId()).get();
+        Film newFilm = filmDbStorage.findById(film.getId()).get();
 
         assertEquals("Man", newFilm.getName());
     }
@@ -44,11 +44,11 @@ class FilmDbStorageTest {
 
         filmDbStorage.add(film);
 
-        assertEquals(1L, filmDbStorage.getFilms().size());
+        assertEquals(1L, filmDbStorage.findFilms().size());
 
-        assertEquals("R", filmDbStorage.getById(1).get().getMpa().getName());
-        assertEquals("Man", filmDbStorage.getById(1).get().getName());
-        assertEquals(121, filmDbStorage.getById(1).get().getDuration());
+        assertEquals("R", filmDbStorage.findById(1).get().getMpa().getName());
+        assertEquals("Man", filmDbStorage.findById(1).get().getName());
+        assertEquals(121, filmDbStorage.findById(1).get().getDuration());
     }
 
     @Test
@@ -56,11 +56,11 @@ class FilmDbStorageTest {
         Film film = new Film(1L, "Dorian Grey", "Not Alexandra",
                 LocalDate.of(2005, 2, 1), 2, new Mpa(4, "R"));
         filmDbStorage.add(film);
-        assertEquals("Dorian Grey", filmDbStorage.getById(1).get().getName());
+        assertEquals("Dorian Grey", filmDbStorage.findById(1).get().getName());
 
         film.setName("Boromir");
         filmDbStorage.update(film);
-        assertEquals("Boromir", filmDbStorage.getById(1).get().getName());
+        assertEquals("Boromir", filmDbStorage.findById(1).get().getName());
     }
 
     @Test
@@ -78,7 +78,7 @@ class FilmDbStorageTest {
         filmDbStorage.add(two);
         filmDbStorage.add(three);
 
-        List<Film> films = filmDbStorage.getFilms();
+        List<Film> films = filmDbStorage.findFilms();
 
         assertEquals(3, films.size());
         assertEquals("Heroes", films.get(2).getName());
@@ -102,13 +102,13 @@ class FilmDbStorageTest {
         filmDbStorage.putLike(one.getId(), first.getId());
         filmDbStorage.putLike(one.getId(), second.getId());
 
-        List<Long> likes = filmDbStorage.getLikes(one.getId());
+        List<Long> likes = filmDbStorage.findLikes(one.getId());
 
         assertEquals(2, likes.size());
         assertEquals(1, likes.get(0));
 
         filmDbStorage.removeLike(one.getId(), second.getId());
-        likes = filmDbStorage.getLikes(one.getId());
+        likes = filmDbStorage.findLikes(one.getId());
 
         assertEquals(1, likes.size());
     }

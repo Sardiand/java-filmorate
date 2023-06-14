@@ -13,7 +13,7 @@ public interface UserStorage {
 
     void update(User user);
 
-    List<User> getUsers();
+    List<User> findUsers();
 
     Optional<User> getById(long id);
 
@@ -23,5 +23,5 @@ public interface UserStorage {
 
     boolean checkIsFriendshipExist(long userId, long friendId);
 
-    List<Long> getFriends(long id);
+    List<Long> findFriends(long id);
 }

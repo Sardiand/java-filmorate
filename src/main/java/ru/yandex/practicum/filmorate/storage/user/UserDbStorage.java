@@ -74,7 +74,7 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
-    public List<User> getUsers() {
+    public List<User> findUsers() {
         return jdbcTemplate.query("SELECT * FROM users", new UserMapper());
     }
 
@@ -91,7 +91,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public List<Long> getFriends(long id) {
+    public List<Long> findFriends(long id) {
         return jdbcTemplate.queryForList("SELECT to_user_id FROM user_friendship WHERE from_user_id="
                 + id + " ORDER BY to_user_id", Long.class);
     }

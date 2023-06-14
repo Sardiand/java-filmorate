@@ -23,7 +23,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Optional<Film> getById(long id) {
+    public Optional<Film> findById(long id) {
         return Optional.ofNullable(films.get(id));
     }
 
@@ -33,13 +33,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getFilms() {
+    public List<Film> findFilms() {
         return new ArrayList<>(films.values());
     }
 
     @Override
-    public List<Film> getPopular(int count) {
-        List<Film> filmList = getFilms();
+    public List<Film> findPopular(int count) {
+        List<Film> filmList = findFilms();
         filmList.sort(Comparator.comparing(film -> film.getLikes().size(), Comparator.reverseOrder()));
         if (filmList.size() > count) {
             return filmList.subList(0, count);
@@ -70,7 +70,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         films.get(filmId).getLikes().remove(userId);
     }
 
-    public List<Long> getLikes(long filmId) {
+    public List<Long> findLikes(long filmId) {
         return new ArrayList<>(films.get(filmId).getLikes());
     }
 
