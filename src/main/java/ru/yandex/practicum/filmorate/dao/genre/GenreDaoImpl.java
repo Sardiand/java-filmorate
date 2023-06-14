@@ -27,7 +27,7 @@ public class GenreDaoImpl implements GenreDao {
         SqlRowSet ratingRow = jdbcTemplate.queryForRowSet("SELECT * FROM genre WHERE genre_id=?", id);
         if (ratingRow.next()) {
             Genre genre = new Genre(ratingRow.getInt("genre_id"),
-                    Objects.requireNonNull(ratingRow.getString("name")));
+                    ratingRow.getString("name"));
             log.info("Found genre {} by id {}.", id, genre.getName());
             return Optional.of(genre);
         } else {
@@ -37,21 +37,7 @@ public class GenreDaoImpl implements GenreDao {
     }
 
     @Override
-    public Optional<Genre> get(String name) {
-        SqlRowSet ratingRow = jdbcTemplate.queryForRowSet("SELECT * FROM genre WHERE name=?", name);
-        if (ratingRow.next()) {
-            Genre genre = new Genre(ratingRow.getInt("genre_id"),
-                    Objects.requireNonNull(ratingRow.getString("name")));
-            log.info("Found genre {}.", genre.getName());
-            return Optional.of(genre);
-        } else {
-            log.info("Genre {} is not found.", name);
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public Collection<Genre> getAll() {
+    public List<Genre> getAll() {
         List<Genre> genres = jdbcTemplate.query("SELECT * FROM genre ORDER BY genre_id",
                 new GenreMapper());
         log.info("Got all genres.");

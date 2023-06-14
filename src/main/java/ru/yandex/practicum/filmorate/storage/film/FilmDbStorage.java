@@ -9,7 +9,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.film.FilmMapper;
-import ru.yandex.practicum.filmorate.dao.mpa.MpaRatingDaoImpl;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
@@ -35,12 +34,11 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Optional<Film> getById(long id) {
-        if (jdbcTemplate.query("SELECT * FROM film WHERE film_id=" + id, new FilmMapper(jdbcTemplate,
-                new MpaRatingDaoImpl(jdbcTemplate))).isEmpty()) {
+        String sql = "SELECT * FROM film WHERE film_id=" + id;
+        if (jdbcTemplate.query(sql, new FilmMapper()).isEmpty()) {
             return Optional.empty();
         } else {
-            return Optional.of(jdbcTemplate.query("SELECT * FROM film WHERE film_id=" + id,
-                    new FilmMapper(jdbcTemplate, new MpaRatingDaoImpl(jdbcTemplate))).get(0));
+            return Optional.of(jdbcTemplate.query(sql, new FilmMapper()).get(0));
         }
     }
 
@@ -79,8 +77,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getFilms() {
-        List<Film> films = jdbcTemplate.query("SELECT * FROM film ORDER BY film_id", new FilmMapper(jdbcTemplate,
-                new MpaRatingDaoImpl(jdbcTemplate)));
+        List<Film> films = jdbcTemplate.query("SELECT * FROM film ORDER BY film_id", new FilmMapper());
         log.info("Got all films.");
         return films;
     }
@@ -116,7 +113,7 @@ public class FilmDbStorage implements FilmStorage {
                 "GROUP BY f.film_id " +
                 "ORDER BY COUNT(fl.film_id) " +
                 "DESC LIMIT ?";
-        return jdbcTemplate.query(sql, new FilmMapper(jdbcTemplate, new MpaRatingDaoImpl(jdbcTemplate)), count);
+        return jdbcTemplate.query(sql, new FilmMapper(), count);
     }
 
     @Override

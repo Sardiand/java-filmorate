@@ -27,7 +27,7 @@ public class MpaRatingDaoImpl implements MpaRatingDao {
         SqlRowSet ratingRow = jdbcTemplate.queryForRowSet("SELECT * FROM mpa_rating WHERE mpa_rating_id=?", id);
         if (ratingRow.next()) {
             Mpa rating = new Mpa(ratingRow.getInt("mpa_rating_id"),
-                    Objects.requireNonNull(ratingRow.getString("rating")));
+                    (ratingRow.getString("rating")));
             log.info("Found rating MPA {} by id {}.", rating.getName(), id);
             return Optional.of(rating);
         } else {
